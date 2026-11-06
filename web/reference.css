@@ -1,0 +1,125 @@
+/* RS compact target UI: normal eye and list, slightly enlarged for readability. */
+:root {
+  --cyan: #40dcf3;
+  --eye-size: clamp(22px, 1.8vh, 36px);
+  --row-width: clamp(210px, 18vh, 350px);
+  --row-height: clamp(30px, 2.6vh, 46px);
+  --row-font: clamp(14px, 1.45vh, 24px);
+}
+#target-panel, .single-target #target-panel {
+  left: calc(50% + var(--eye-size) / 2 + 16px);
+  top: calc(50% - var(--row-height) / 2);
+  width: var(--row-width); max-width: calc(50vw - var(--eye-size) / 2 - 24px);
+  transform: none; perspective: none;
+}
+.target-heading, #target-branches, #vehicle-pin-lines { display: none; }
+#options-wrapper {
+  display: flex; flex-direction: column; gap: clamp(4px, .4vh, 7px);
+  padding: 3px; max-height: calc(50vh - 20px); overflow-x: hidden; overflow-y: auto;
+}
+#options-wrapper .option-container, #options-wrapper .option-container:nth-child(even) {
+  position: relative; left: auto !important; top: auto !important;
+  display: flex; flex-direction: row; align-items: center; justify-content: flex-start;
+  flex: 0 0 auto; width: 100%; height: auto; min-height: var(--row-height);
+  padding: clamp(5px, .45vh, 9px) clamp(8px, .65vh, 13px);
+  gap: clamp(7px, .65vh, 12px);
+  border: 1px solid #ffffff18; border-left: 2px solid var(--option-accent);
+  border-radius: 5px; background: #0d1822dd;
+  box-shadow: 0 2px 5px #0005; text-align: left;
+  transform: none; animation: none; transition: background .12s, border-color .12s;
+}
+#options-wrapper .option-container::before, #options-wrapper .option-container::after,
+.option-art, .option-number, .option-description, .option-edge, .option-connector,
+.option-arrow { display: none; }
+#options-wrapper .option-container .option-copy {
+  flex: 1; min-width: 0; padding: 0; align-items: flex-start; text-align: left;
+  gap: 0; transform: none;
+}
+#options-wrapper .option-container .option-label {
+  font-size: var(--row-font); font-weight: 600; line-height: 1.25;
+  overflow-wrap: anywhere; letter-spacing: 0; text-shadow: 0 1px 2px #0008;
+}
+#options-wrapper .option-container .option-badge {
+  order: -1; width: clamp(20px, 1.8vh, 30px); height: clamp(20px, 1.8vh, 30px);
+  flex: 0 0 clamp(20px, 1.8vh, 30px); border: 0; border-radius: 0;
+  background: none; box-shadow: none; transform: none;
+}
+#options-wrapper .option-container .option-icon {
+  font-size: clamp(15px, 1.45vh, 24px); filter: none;
+}
+#options-wrapper .option-container:hover,
+#options-wrapper .option-container:focus-visible,
+#options-wrapper .option-container.option-linked {
+  background: #203747f2; border-color: var(--option-accent);
+  transform: none; box-shadow: 0 2px 5px #0006;
+}
+#options-wrapper .option-container:focus-visible { outline: 1px solid #dff7ff; outline-offset: -2px; }
+#options-wrapper .option-container:disabled { opacity: .4; cursor: not-allowed; }
+#options-wrapper .option-container.option-preview { border-style: dashed; }
+#target-overflow {
+  position: absolute; top: 100%; width: 100%; margin-top: 3px;
+  font-size: 8px; letter-spacing: 1px;
+}
+#eye {
+  width: var(--eye-size); height: var(--eye-size); scale: 1;
+  perspective: 400px; transform-style: preserve-3d;
+}
+#eyeSvg {
+  width: 100%; height: 100%; stroke-width: 2.3; z-index: 2;
+  filter: drop-shadow(0 0 2px #00d9f740);
+}
+.eye-outline { stroke-width: 2.7; }
+.eye-iris { fill: #0d2632; stroke-width: 2.2; }
+.eye-pupil { fill: var(--eye-color); }
+.reticle-ambient, .reticle-core, .reticle-bracket, .reticle-ticks,
+.reticle-top, .reticle-bottom, .eye-status, .eye-mark { display: none; }
+.reticle-ring {
+  inset: 0; border: 1px solid #73d7e56e; border-radius: 50%;
+  background: #07121bc9; box-shadow: 0 0 5px #00d9f730;
+}
+.reticle-outer {
+  inset: -10%; border: 1px solid #32d7ed70; border-radius: 50%;
+  background: conic-gradient(#40dcf3 0 15%, transparent 15% 50%, #40dcf3 50% 65%, transparent 65%);
+  -webkit-mask: radial-gradient(transparent 64%, #000 65% 71%, transparent 72%);
+  mask: radial-gradient(transparent 64%, #000 65% 71%, transparent 72%);
+  opacity: .6;
+}
+.target-acquired .reticle-outer { animation: reticle-depth-spin 8s linear infinite; }
+.reticle-orbit {
+  position: absolute; inset: -14%; border: 1px solid #40dcf34d;
+  border-top-color: var(--eye-color); border-radius: 50%; opacity: 0;
+}
+.target-acquired .orbit-a { opacity: .35; animation: orbit-depth-a 9s linear infinite; }
+.target-acquired .orbit-b { opacity: .25; animation: orbit-depth-b 11s linear infinite; }
+.reticle-contact {
+  position: absolute; top: calc(50% - 1px); width: 2px; height: 2px;
+  border-radius: 50%; background: var(--eye-color); opacity: 0;
+}
+.contact-left { left: 0; } .contact-right { right: 0; }
+.reticle-shockwave { position: absolute; inset: -8%; border: 1px solid var(--eye-color); border-radius: 50%; opacity: 0; }
+.eye-contact .reticle-shockwave { animation: contact-wave .65s ease-out both; }
+.eye-contact #eyeSvg { animation: contact-eye .55s ease-out both; }
+.eye-contact #eye[data-contact-side="left"] .contact-left,
+.eye-contact #eye[data-contact-side="right"] .contact-right { animation: contact-flare .65s ease-out both; }
+#target-link { z-index: 2; }
+#link-glow { stroke-width: 4; opacity: .15; }
+#link-line { stroke-width: 1; stroke-dasharray: 3 3; opacity: .65; }
+.has-selection #link-line { animation: link-current .8s linear infinite; }
+@keyframes reticle-depth-spin {
+  0% { transform: rotateX(20deg) rotateY(-16deg) rotateZ(0deg); }
+  50% { transform: rotateX(-17deg) rotateY(22deg) rotateZ(180deg); }
+  100% { transform: rotateX(20deg) rotateY(-16deg) rotateZ(360deg); }
+}
+@keyframes orbit-depth-a { from { transform: rotateX(55deg) rotateZ(0deg); } to { transform: rotateX(55deg) rotateZ(360deg); } }
+@keyframes orbit-depth-b { from { transform: rotateY(55deg) rotateZ(360deg); } to { transform: rotateY(55deg) rotateZ(0deg); } }
+@keyframes contact-wave { from { opacity: .7; transform: scale(.8); } to { opacity: 0; transform: scale(1.4); } }
+@keyframes contact-eye { 0%,100% { transform: scale(1); } 30% { transform: scale(1.06); } }
+@keyframes contact-flare { 0%,100% { opacity: 0; } 30% { opacity: 1; box-shadow: 0 0 5px var(--eye-color); } }
+@keyframes link-current { to { stroke-dashoffset: -18; } }
+@media (max-width: 650px) {
+  :root { --row-font: 12px; --row-height: 28px; }
+  #target-panel, .single-target #target-panel { max-width: calc(50vw - 32px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  #eye *, #link-line, #options-wrapper .option-container { animation: none !important; transition: none !important; }
+}

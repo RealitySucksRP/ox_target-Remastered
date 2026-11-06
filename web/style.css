@@ -1,0 +1,427 @@
+/* RealitySucksRP Target HUD — visual layer only; ox_target controls focus and actions. */
+:root {
+  color-scheme: normal;
+  --cyan: #40dcf3;
+  --active-accent: var(--cyan);
+  --text: #f0f6fd;
+  --muted: #8da5b6;
+  --card-width: clamp(224px, 18vw, 302px);
+  --spine-gap: clamp(84px, 7vw, 110px);
+  --row-gap: 10px;
+}
+* { box-sizing: border-box; }
+html, body {
+  margin: 0;
+  width: 100%;
+  height: 100%;
+  background: transparent !important;
+  color-scheme: normal !important;
+  overflow: hidden;
+}
+body {
+  display: none;
+  visibility: hidden;
+  font-family: 'Segoe UI', 'Arial', sans-serif;
+  color: var(--text);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+body.targeting-active { display: block; }
+button { font: inherit; }
+button:focus { outline: none; }
+
+/* Eye: independent from NUI mouse focus and always anchored to the screen center. */
+#eye {
+  position: fixed;
+  top: 50%; left: 50%;
+  width: 76px; height: 76px;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  display: grid;
+  place-items: center;
+  isolation: isolate;
+  z-index: 5;
+  --eye-color: #8baebe;
+  filter: drop-shadow(0 3px 7px #0009);
+}
+.target-acquired #eye { --eye-color: var(--cyan); }
+.has-selection #eye { --eye-color: var(--active-accent); }
+.reticle-ambient {
+  position: absolute; inset: -16px; border-radius: 50%;
+  background: radial-gradient(circle, #07172396 0 31%, #0c1e27b8 31% 39%, #21b9d014 40%, transparent 67%);
+  opacity: .87;
+}
+.reticle-outer {
+  position: absolute; inset: 1px; border-radius: 50%;
+  border: 1px solid #6cbdcf58;
+  box-shadow: inset 0 0 0 4px #06152080, 0 0 12px #2cf3ff14;
+  background: conic-gradient(from -5deg, transparent 0 11%, #4ddbefb5 11% 17%, transparent 17% 35%, #47dbea99 35% 42%, transparent 42% 61%, #4be1f3b8 61% 68%, transparent 68% 86%, #4be1f388 86% 90%, transparent 90%);
+  -webkit-mask: radial-gradient(transparent 0 30px, #000 31px);
+  mask: radial-gradient(transparent 0 30px, #000 31px);
+}
+.reticle-ticks {
+  position: absolute; inset: 8px; border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, #8bdde650 0deg 2deg, transparent 2deg 22.5deg);
+  -webkit-mask: radial-gradient(transparent 0 25px, #000 26px 28px, transparent 29px);
+  mask: radial-gradient(transparent 0 25px, #000 26px 28px, transparent 29px);
+}
+.reticle-ring {
+  position: absolute; inset: 12px; border-radius: 50%;
+  border: 1px solid #75e8f06c;
+  box-shadow: inset 0 0 10px #0ae8f517, 0 0 9px #0eddeb22;
+  background: radial-gradient(circle, #0b2637f5 0 40%, #051019ea 70%);
+}
+.reticle-bracket {
+  position: absolute; inset: -4px; border-radius: 18px;
+  border: 2px solid transparent;
+  border-top-color: #55d4e5a0;
+  border-bottom-color: #55d4e58c;
+  transform: rotate(45deg) scale(.79);
+  transition: transform .28s ease, border-color .2s;
+}
+.bracket-b { inset: 5px; transform: rotate(-45deg) scale(.76); opacity: .6; }
+.target-acquired .bracket-a { transform: rotate(45deg) scale(.96); }
+.target-acquired .bracket-b { transform: rotate(-45deg) scale(.95); }
+.has-selection .reticle-bracket { border-top-color: var(--active-accent); border-bottom-color: var(--active-accent); }
+.reticle-core {
+  position: absolute; inset: 20px; border-radius: 50%;
+  background: radial-gradient(circle at 45% 40%, #246177, #04141fe8 67%);
+  border: 1px solid #bbf7ff1f;
+  box-shadow: inset 0 0 13px #0006, 0 0 9px #0abeda26;
+}
+#eyeSvg {
+  position: relative; z-index: 1;
+  width: 45px; height: 45px;
+  stroke: var(--eye-color);
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 0 4px #40dcf341);
+  transition: stroke .18s, filter .18s;
+}
+.eye-outline { stroke-width: 2.4; }
+.eye-iris { fill: #0d2732; stroke-width: 2.2; }
+.eye-pupil { fill: var(--eye-color); stroke: none; }
+.eye-mark { opacity: .6; stroke-width: 1.2; }
+.has-selection #eyeSvg { filter: drop-shadow(0 0 5px var(--active-accent)); }
+.reticle-top, .reticle-bottom {
+  position: absolute; width: 4px; height: 4px;
+  left: calc(50% - 2px);
+  background: var(--eye-color);
+  transform: rotate(45deg);
+  box-shadow: 0 0 8px var(--eye-color);
+  opacity: 0;
+}
+.reticle-top { top: -11px; } .reticle-bottom { bottom: -11px; }
+.target-acquired .reticle-top, .target-acquired .reticle-bottom { opacity: 1; }
+.eye-status {
+  position: absolute; bottom: -21px; left: 0; right: 0;
+  font-size: 7px; font-weight: 800; letter-spacing: 2px;
+  text-align: center; color: #90c0ce;
+  text-shadow: 0 1px 3px #000;
+  opacity: 0; transition: color .2s, opacity .2s;
+}
+.target-acquired .eye-status { opacity: 1; }
+.has-selection .eye-status { color: var(--active-accent); }
+.has-selection .eye-status::before { content: 'LINKED'; }
+.has-selection .eye-status { font-size: 0; }
+.has-selection .eye-status::before { font-size: 7px; }
+.target-acquired .reticle-ticks { animation: reticle-spin 28s linear infinite; }
+.target-acquired .reticle-outer { animation: reticle-spin-reverse 22s linear infinite; }
+
+/* A real SVG connection points from the active card to the eye. Never intercept clicks. */
+#target-link { position: fixed; inset: 0; width: 100%; height: 100%; z-index: 2; pointer-events: none; overflow: visible; opacity: 0; transition: opacity .15s; }
+.has-selection #target-link { opacity: 1; }
+#link-glow, #link-line { fill: none; stroke: var(--active-accent); stroke-linecap: round; }
+#link-glow { stroke-width: 7; opacity: .11; }
+#link-line { stroke-width: 1.5; opacity: .79; stroke-dasharray: 4 4; }
+
+/* Balanced two-column targets, original centerline and ox_target ordering preserved. */
+#target-panel {
+  position: fixed;
+  left: 50%; top: 50%;
+  transform: translate(-50%, -50%);
+  width: calc(var(--card-width) * 2 + var(--spine-gap) + 16px);
+  max-width: 96vw;
+  z-index: 3;
+  pointer-events: none;
+  perspective: 900px;
+  opacity: 0;
+  transition: opacity .12s;
+}
+.target-acquired #target-panel { opacity: 1; }
+.target-heading {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  margin-bottom: 16px;
+  font-size: 10px; font-weight: 800; letter-spacing: 2.8px;
+  color: #dbe8f4;
+  text-shadow: 0 2px 4px #000;
+}
+.signal-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--cyan); box-shadow: 0 0 8px var(--cyan), 0 0 14px #0ce3ff6b; }
+#option-count {
+  padding: 2px 6px;
+  border: 1px solid #6bcfe273;
+  border-radius: 4px;
+  background: #091823d4;
+  font-size: 10px; color: var(--cyan); letter-spacing: 1px;
+  box-shadow: inset 0 0 7px #16b7d11d;
+  font-variant-numeric: tabular-nums;
+}
+#options-wrapper {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--row-gap) var(--spine-gap);
+  padding: 10px 8px 13px;
+  max-height: min(65vh, 625px);
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  pointer-events: auto;
+  scroll-padding: 10px;
+  perspective: 900px;
+}
+#options-wrapper::-webkit-scrollbar { display: none; width: 0; }
+.option-container {
+  --option-accent: var(--cyan);
+  position: relative; isolation: isolate;
+  display: flex; align-items: center; justify-content: space-between; gap: 11px;
+  width: 100%; min-height: 57px;
+  padding: 7px 11px 7px 16px;
+  border: 1px solid #7295a65e;
+  border-bottom-color: #638b9fb0;
+  border-radius: 10px 10px 4px 10px;
+  color: var(--text);
+  background: linear-gradient(127deg, #293d4ced 0%, #162736f5 46%, #071622f7 100%);
+  box-shadow: 0 3px 0 #050b13ca, 0 8px 14px #0005, inset 0 1px #d2f4ff1a;
+  cursor: pointer;
+  transform: perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg));
+  transform-style: preserve-3d;
+  transition: transform .17s ease-out, background .17s, border-color .17s, box-shadow .17s, filter .17s;
+  animation: card-arrive .28s cubic-bezier(.2,.82,.25,1) both;
+  animation-delay: var(--entry-delay, 0ms);
+  text-align: left;
+}
+.option-container:nth-child(even) {
+  flex-direction: row-reverse;
+  border-radius: 10px 10px 10px 4px;
+  padding: 7px 16px 7px 11px;
+  background: linear-gradient(231deg, #293d4ced 0%, #162736f5 46%, #071622f7 100%);
+}
+.option-container::before {
+  content: '';
+  position: absolute; inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(ellipse at var(--light-x,48%) var(--light-y,35%), color-mix(in srgb,var(--option-accent) 18%,transparent), transparent 73%);
+  opacity: .18; transition: opacity .17s;
+  pointer-events: none;
+  z-index: -1;
+}
+.option-container::after {
+  content: ''; position: absolute; inset: 3px 4px auto;
+  height: 1px; border-radius: 5px;
+  background: linear-gradient(90deg, transparent, #def7ff35 50%, transparent);
+  pointer-events: none;
+}
+.option-copy {
+  min-width: 0; flex: 1;
+  display: flex; flex-direction: column; justify-content: center;
+  gap: 2px;
+  transform: translateZ(5px);
+}
+.option-container:nth-child(odd) .option-copy { align-items: flex-end; text-align: right; }
+.option-container:nth-child(even) .option-copy { align-items: flex-start; text-align: left; }
+.option-number {
+  font-size: 8px; font-weight: 800; letter-spacing: 1.6px;
+  color: var(--option-accent); opacity: .65;
+  line-height: 1; font-variant-numeric: tabular-nums;
+}
+.option-label {
+  display: block; max-width: 100%;
+  font-size: 12px; font-weight: 700; letter-spacing: .05px;
+  line-height: 1.28;
+  overflow-wrap: anywhere;
+  text-shadow: 0 1px 3px #0008;
+}
+.option-badge {
+  position: relative;
+  display: grid; place-items: center;
+  width: 36px; height: 36px; flex: 0 0 36px;
+  border: 1px solid var(--option-accent);
+  border-radius: 10px;
+  background: linear-gradient(150deg, #304d5a 0%, #122331 56%, #07131e 100%);
+  box-shadow: inset 0 0 0 3px #06111e73, inset 0 0 11px color-mix(in srgb,var(--option-accent) 15%,transparent), 0 0 8px color-mix(in srgb,var(--option-accent) 15%,transparent);
+  color: var(--option-accent);
+  transform: translateZ(9px);
+  transition: transform .15s, box-shadow .15s;
+}
+.option-icon { font-size: 15px; color: inherit; filter: drop-shadow(0 0 3px color-mix(in srgb,var(--option-accent) 40%,transparent)); }
+.option-edge {
+  position: absolute; left: -1px; top: 11px; bottom: 11px;
+  width: 3px; border-radius: 2px;
+  background: var(--option-accent);
+  box-shadow: 0 0 8px var(--option-accent);
+  opacity: .8;
+}
+.option-container:nth-child(even) .option-edge { left: auto; right: -1px; }
+.option-connector {
+  position: absolute; top: 50%; right: -11px; width: 10px; height: 1px;
+  background: color-mix(in srgb,var(--option-accent) 55%,transparent);
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+.option-container:nth-child(even) .option-connector { right: auto; left: -11px; }
+.option-pip {
+  position: absolute; right: -2px; top: -2px; width: 5px; height: 5px;
+  border: 1px solid var(--option-accent); border-radius: 50%;
+  background: #0f2633;
+}
+.option-container:nth-child(even) .option-pip { right: auto; left: -2px; }
+.option-container:hover, .option-container:focus-visible, .option-container.option-linked {
+  z-index: 2;
+  border-color: var(--option-accent);
+  box-shadow: 0 3px 0 #050b13ca, 0 9px 17px #0008, 0 0 15px color-mix(in srgb,var(--option-accent) 24%,transparent), inset 0 1px #d2f4ff48;
+  transform: perspective(900px) rotateX(var(--tilt-x,0deg)) rotateY(var(--tilt-y,0deg)) translateY(-1px);
+}
+.option-container:hover::before, .option-container:focus-visible::before, .option-linked::before { opacity: 1; }
+.option-container:hover .option-badge, .option-container:focus-visible .option-badge, .option-linked .option-badge {
+  transform: translateZ(15px) scale(1.055);
+  box-shadow: inset 0 0 0 3px #06111e73, inset 0 0 13px color-mix(in srgb,var(--option-accent) 23%,transparent), 0 0 13px color-mix(in srgb,var(--option-accent) 37%,transparent);
+}
+.option-container:active, .option-container.option-pressed { transform: translateY(2px); filter: brightness(1.18); }
+.option-container:disabled { cursor: default; }
+
+#target-overflow {
+  text-align: center; height: 18px; margin-top: 4px;
+  color: #a5c4d1; font-size: 8px; letter-spacing: 1.9px; font-weight: 750;
+  text-shadow: 0 1px 3px #000;
+  opacity: 0; transition: opacity .15s;
+}
+.has-more-below #target-overflow { opacity: .9; }
+#target-overflow i { font-size: 8px; margin: 0 7px; color: var(--cyan); }
+
+@keyframes card-arrive {
+  from { opacity: 0; translate: 0 6px; scale: .98; }
+  to { opacity: 1; translate: 0 0; scale: 1; }
+}
+@keyframes reticle-spin { to { transform: rotate(360deg); } }
+@keyframes reticle-spin-reverse { to { transform: rotate(-360deg); } }
+
+@media (max-width: 950px) {
+  :root { --card-width: clamp(180px, 29vw, 252px); --spine-gap: 77px; }
+  .option-label { font-size: 11px; }
+  .option-container { min-height: 52px; }
+}
+@media (max-width: 560px) {
+  :root { --card-width: clamp(136px, 35vw, 190px); --spine-gap: 62px; --row-gap: 7px; }
+  #eye { scale: .8; }
+  .option-container { min-height: 48px; gap: 6px; padding: 6px 7px; }
+  .option-container:nth-child(even) { padding: 6px 7px; }
+  .option-badge { width: 29px; height: 29px; flex-basis: 29px; border-radius: 7px; }
+  .option-label { font-size: 10px; }
+  .option-number { font-size: 7px; }
+  .target-heading { margin-bottom: 8px; }
+}
+@media (max-height: 640px) {
+  #options-wrapper { max-height: 68vh; }
+  .option-container { min-height: 49px; }
+  :root { --row-gap: 8px; }
+  .target-heading { margin-bottom: 8px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+  .option-container, .option-container:hover, .option-container:focus-visible { transform: none !important; }
+  .option-badge { transform: none !important; }
+}
+@supports not (color: color-mix(in srgb, red, blue)) {
+  .option-badge { box-shadow: inset 0 0 8px #1ec0de22; }
+  .option-container::before { background: radial-gradient(ellipse at center, #90cfff20, transparent 75%); }
+  .option-container:hover, .option-container.option-linked { box-shadow: 0 3px 0 #050b13, 0 9px 17px #0008, 0 0 10px #40dcf333; }
+  .option-connector { background: var(--option-accent); }
+}
+
+/* RS vehicle halo: project eligible options around the vehicle, not over its
+   dashboard or along a generic website sidebar. Fallback grid stays intact. */
+#vehicle-pin-lines {
+  position: fixed; inset: 0; width: 100%; height: 100%;
+  pointer-events: none; z-index: 2; opacity: 0;
+}
+.vehicle-spatial #vehicle-pin-lines { opacity: .77; }
+#vehicle-pin-lines path { fill: none; stroke-width: 1.4; stroke-dasharray: 3 4; opacity: .66; }
+.vehicle-spatial #target-panel {
+  inset: 0; width: 100%; height: 100%; max-width: none;
+  transform: none; perspective: none;
+}
+.vehicle-spatial .target-heading {
+  position: absolute; top: calc(50% - 93px); left: 50%;
+  transform: translateX(-50%); padding: 5px 10px;
+  border-radius: 8px; border: 1px solid #59aabb39;
+  background: #081925d4; margin: 0;
+  box-shadow: 0 4px 12px #0006;
+}
+.vehicle-spatial #options-wrapper {
+  position: absolute; inset: 0;
+  display: block; width: 100%; height: 100%;
+  max-height: none; padding: 0; margin: 0;
+  overflow: visible; pointer-events: none;
+}
+.vehicle-spatial .option-container,
+.vehicle-spatial .option-container:nth-child(even) {
+  position: absolute; width: clamp(152px, 12.8vw, 202px);
+  min-height: 45px; height: auto; padding: 6px 10px;
+  display: flex; flex-direction: row; gap: 7px;
+  border-radius: 9px; text-align: left;
+  background: linear-gradient(130deg, #142b3aeF, #071621f5);
+  pointer-events: auto;
+  animation: card-arrive .2s ease-out both;
+  box-shadow: 0 2px 0 #020a12, 0 4px 12px #000a, 0 0 11px color-mix(in srgb,var(--option-accent) 19%,transparent);
+}
+.vehicle-spatial .option-container .option-badge { width: 31px; height: 31px; flex: 0 0 31px; border-radius: 8px; }
+.vehicle-spatial .option-container .option-copy { align-items: flex-start; text-align: left; }
+.vehicle-spatial .option-container .option-label { font-size: 11px; }
+.vehicle-spatial .option-container .option-number { font-size: 7px; }
+.vehicle-spatial .option-container.spatial-left { flex-direction: row-reverse; }
+.vehicle-spatial .option-container.spatial-left .option-copy { align-items: flex-end; text-align: right; }
+.vehicle-spatial .option-container.spatial-left .option-edge { left: auto; right: -1px; }
+.vehicle-spatial .option-container.spatial-right .option-edge { right: auto; left: -1px; }
+.vehicle-spatial .option-container .option-connector { display: none; }
+.vehicle-spatial #target-overflow { display: none; }
+.vehicle-spatial .option-container:hover, .vehicle-spatial .option-container.option-linked {
+  background: linear-gradient(130deg, #294456fa, #091c2aeF);
+  border-color: var(--option-accent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .vehicle-spatial .option-container, .vehicle-spatial .option-container:nth-child(even) {
+    animation: none !important; transform: none !important;
+  }
+}
+
+/* RS v1.18.4: stable vehicle overview and visually distinct range previews. */
+.vehicle-spatial .option-container, .vehicle-spatial .option-container:nth-child(even) {
+  width: clamp(168px, 15.5vw, 222px);
+  min-height: 43px;
+  animation: none;
+  transition: left .23s ease-out, top .23s ease-out, border-color .17s, box-shadow .17s, background .17s;
+}
+.vehicle-spatial .option-container .option-label { font-size: 12px; }
+.vehicle-spatial .option-container.option-preview,
+.vehicle-spatial .option-container.option-preview:nth-child(even) {
+  opacity: .48;
+  filter: saturate(.48);
+  cursor: not-allowed;
+  border-style: dashed;
+  box-shadow: 0 2px 0 #020a12, 0 4px 9px #0009;
+}
+.vehicle-spatial .option-container.option-preview::after {
+  content: 'MOVE CLOSER';
+  position: absolute; right: 8px; top: auto; bottom: 1px; left: auto;
+  height: auto; width: auto;
+  font-size: 7px; font-weight: 800; letter-spacing: .7px;
+  color: #bed2dc; background: transparent;
+}
+.vehicle-spatial .option-container.option-preview.spatial-left::after { right: auto; left: 8px; }
+.vehicle-spatial .option-container.option-preview .option-label { padding-bottom: 6px; }
+.vehicle-spatial #vehicle-pin-lines path { opacity: .6; }
+@media (prefers-reduced-motion: reduce) {
+  .vehicle-spatial .option-container { transition: none !important; }
+}

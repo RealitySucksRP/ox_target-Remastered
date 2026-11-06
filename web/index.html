@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="color-scheme" content="normal" />
+  <style>html,body{background:transparent!important;color-scheme:normal!important}</style>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="transparent" />
+  <title>ox_target Remastered Interface</title>
+  <link rel="stylesheet" href="vendor/fontawesome/css/all.min.css" />
+  <link rel="stylesheet" href="style.css?v=1.18.10" />
+  <link rel="stylesheet" href="reference.css?v=1.18.10" />
+</head>
+<body>
+  <!-- Decorative vector: no hit area, no gameplay raycasts and no external assets. -->
+  <svg id="target-link" aria-hidden="true" preserveAspectRatio="none">
+    <path id="link-glow"></path>
+    <path id="link-line"></path>
+  </svg>
+
+  <svg id="vehicle-pin-lines" aria-hidden="true" preserveAspectRatio="none"></svg>
+  <svg id="target-branches" aria-hidden="true" preserveAspectRatio="none"></svg>
+
+  <div id="eye" aria-hidden="true">
+    <span class="reticle-ambient"></span>
+    <span class="reticle-outer"></span>
+    <span class="reticle-ticks"></span>
+    <span class="reticle-orbit orbit-a"></span>
+    <span class="reticle-orbit orbit-b"></span>
+    <span class="reticle-bracket bracket-a"></span>
+    <span class="reticle-bracket bracket-b"></span>
+    <span class="reticle-ring"></span>
+    <span class="reticle-core"></span>
+    <span class="reticle-shockwave"></span>
+    <span class="reticle-contact contact-left"></span>
+    <span class="reticle-contact contact-right"></span>
+    <svg id="eyeSvg" viewBox="0 0 64 64" fill="none">
+      <path class="eye-outline" d="M11 32c5.7-8.7 12.7-13 21-13s15.3 4.3 21 13c-5.7 8.7-12.7 13-21 13S16.7 40.7 11 32Z" />
+      <circle class="eye-iris" cx="32" cy="32" r="8" />
+      <circle class="eye-pupil" cx="32" cy="32" r="3.1" />
+      <path class="eye-mark" d="M32 12v4M32 48v4M5 32h4M55 32h4" />
+    </svg>
+    <span class="reticle-top"></span>
+    <span class="reticle-bottom"></span>
+    <span class="eye-status">LOCKED</span>
+  </div>
+
+  <section id="target-panel" aria-label="Nearby interactions">
+    <header class="target-heading">
+      <span class="signal-dot"></span>
+      <span class="heading-title">INTERACT</span>
+      <span id="option-count" aria-label="Number of actions">00</span>
+    </header>
+    <div id="options-wrapper" role="group" aria-label="Available actions"></div>
+    <div id="target-overflow" aria-hidden="true"><i class="fa-solid fa-angles-down"></i> MORE ACTIONS <i class="fa-solid fa-angles-down"></i></div>
+  </section>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
