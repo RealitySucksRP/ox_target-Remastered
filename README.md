@@ -4,7 +4,7 @@
 
 RealitySucksRP's reworked third-eye targeting interface brings animated targeting feedback, color-coded interactions and custom artwork to the original Overextended ox_target foundation. Keep the familiar targeting API while giving your server a distinct visual identity.
 
-[Free on Tebex](https://reality-sucks-rp-webstore.tebex.io/package/7837366) | [GitHub releases](https://github.com/RealitySucksRP/ox_target-Remastered/releases) | [Website](https://realitysucksrp.github.io/) | [Discord](https://discord.gg/e9V3rPHySx) | [YouTube](https://www.youtube.com/@RealitySucksRP) | [All free scripts](https://reality-sucks-rp-webstore.tebex.io/category/free-scripts)
+[Free on Tebex](https://reality-sucks-rp-webstore.tebex.io/package/7837366) | [Download ZIP](https://github.com/RealitySucksRP/ox_target-Remastered/releases/latest/download/ox_target.zip) | [GitHub releases](https://github.com/RealitySucksRP/ox_target-Remastered/releases) | [Website](https://realitysucksrp.github.io/) | [Discord](https://discord.gg/e9V3rPHySx) | [YouTube](https://www.youtube.com/@RealitySucksRP) | [All free scripts](https://reality-sucks-rp-webstore.tebex.io/category/free-scripts)
 
 ## Included interaction artwork
 
@@ -27,7 +27,7 @@ These are actual theme assets included in the GitHub resource, rather than in-ga
 
 ### Latest Orbital Target edition
 
-The latest supplied Tebex package (1.21.0) introduces a transparent orbital interface, animated SVG icons, contextual themes, particles and vehicle interaction previews. **The GitHub source currently remains at 1.18.10**; use the Tebex package for the newer edition until the repository and release ZIP are synchronized.
+The latest supplied Tebex package (1.21.0) introduces a transparent orbital interface, animated SVG icons, contextual themes, particles and vehicle interaction previews. The GitHub source is synchronized with the supplied 1.21.0 package.
 
 ## Requirements
 

@@ -1,75 +1,51 @@
-**ox_target Remastered — Free FiveM Eye Targeting Interface**
+# ox_target — RS Orbital Target Interface
 
-Version: 1.18.10 (RealitySucksRP package). Original ox_target base: Overextended; local RS interface customizations were developed from an upstream 1.18.1 base. This package is a derivative, not an official Overextended release.
+Version 1.21.0 | Based on Overextended ox_target 1.18.1
 
-**Free and full source**
+A customized interface for the standalone FiveM third-eye targeting resource. Retains the ox_target resource name and targeting API, with a transparent orbital interface, animated SVG icons, context-aware action themes, particle effects and vehicle interaction previews.
 
-The entire resource is provided without escrow, activation, or subscription. The original ox_target source is MIT-licensed. Its original copyright notice and license are retained in `LICENSE`. The bundled Font Awesome Free assets have their own bundled license in `web/vendor/fontawesome/LICENSE.txt`. Review those licenses before redistribution or modifications.
+## Requirements and installation
 
-**What's included**
+- FiveM with a current CfxLua runtime.
+- ox_lib 3.30.0 or later, including any dependencies required by your installed ox_lib version.
+- A supported framework is optional; framework-specific group and item checks depend on the configured integration.
 
-- Animated central eye/reticle and compact, readable interaction actions beside it.
-- Color-coded options for vehicle parts, garage actions, medical, storage, robbery, and other interactions.
-- Local theme artwork and optional per-option `rsTheme`, `rsDescription`, and `iconColor` settings.
-- Stable action buttons during refresh; matching options keep their identity, hover state, and scroll position.
-- Brief (120 ms) visual bridge across a momentary missed raycast, with interaction disabled immediately during that loss.
-- Range and permission restrictions enforced by ox_target as usual; out-of-range previews do not allow selection.
-- Model, entity, bone, zone, player and vehicle targeting through ox_target's existing APIs.
-- Existing localization files, supported framework adapters, and partial qtarget compatibility from the base resource.
-
-This build intentionally shows a compact action list around the eye (including vehicle options). It is not a guarantee that every interaction is shown as a full circular menu around a vehicle or that every GTA prop supports every interaction.
-
-**Requirements**
-
-- FiveM server with GTA V (test on your own Legacy/Enhanced build).
-- `ox_lib` version 3.30.0 or newer, started before this resource (the version is checked by client and server source).
-- Framework optional. Specific inventory, player group and job integrations depend on installed compatible providers.
-
-**Installation**
-
-1. Back up any existing `ox_target`, especially if it was customized.
-2. Install the compatible `ox_lib` dependency. Keep the resource folder named exactly `ox_target` so existing exports and dependent resources continue to work.
-3. Replace the old `ox_target` folder only during a maintenance window; do not run two copies.
-4. Ensure `ox_lib` before `ox_target` in `server.cfg`:
+1. Back up your existing ox_target resource.
+2. Replace its folder with the included `ox_target` folder (do not run two copies).
+3. Ensure ox_lib starts before ox_target. Start resources that register target options afterward.
+4. Restart your server or reconnect and verify registered interactions, distance checks and input focus.
 
 ```cfg
 ensure ox_lib
 ensure ox_target
 ```
 
-5. Restart/reconnect at your chosen maintenance window and verify target zones, entities, vehicle doors, inventory and job-restricted interactions.
+Upstream documentation: https://overextended.dev/ox_target
 
-**Optional settings**
+Upstream project: https://github.com/overextended/ox_target
 
-These are ordinary ox_target convars; add or change them in `server.cfg` before startup:
+## Configuration
 
-```cfg
-setr ox_target:toggleHotkey 0
-setr ox_target:defaultHotkey LMENU
-setr ox_target:drawSprite 1
-setr ox_target:defaults 1
-setr ox_target:leftClick 1
-setr ox_target:debug 0
-```
+See `THEMES.md` for context-aware icon customization and optional vehicle interaction settings. Existing ox_target exports and convars remain available. The interface uses bundled assets; no external image or font service is required by the active UI. The original upstream server version check remains present.
 
-`LMENU` is Left Alt. Hold by default (`toggleHotkey 0`). Player keybind changes may override the default.
+## License and attribution
 
-**Theme customization**
+Core ox_target is licensed under the MIT license by Overextended. The original copyright notice and license are included in `LICENSE`. Font Awesome license terms are included in `web/vendor/fontawesome/LICENSE.txt`. This is a modified distribution, not an official Overextended release.
 
-Read `THEMES.md` for per-option color and artwork examples. `web/js/themes.js` contains the customization library. `web/assets/` contains the included local artwork. None of these changes require edits to the consuming resource's target callbacks.
+### Visual references and credit
 
-**Compatibility and limitations**
+The effects are an original HTML/CSS adaptation inspired by these projects.
+No upstream implementation, images or binaries were copied into this resource;
+their Android, iOS, macOS and desktop components are not FiveM/CEF dependencies.
 
-This package preserves the core `ox_target` resource name, client APIs and partial `qtarget` shim. It does not install or replace `ox_lib`, a framework, `ox_inventory`, or other resources. Existing scripts must register their own target options as before. Fine-grained behavior depends on the consuming resource's own target offsets, bones, distances, and permission checks.
+- [Loop – Kai Azim](https://github.com/mrkai77/Loop): radial targeting feedback and subtle motion; GPL-3.0 project, **design reference only**.
+- [Orbit Menu – David Vaz Teixeira](https://github.com/davidvazteixeira/orbit-menu): radial interaction patterns; MIT project, design reference only.
+- [Orbit Menu – Oussama Meglali](https://github.com/Meglali20/orbit-menu): layered orbit depth; Apache-2.0 project, design reference only.
+- [Orbit Menu for SeelenUI – @ickyaidy](https://seelen.io/resources/nH1xf8YxQQ2RKNl_5Ci3ww/orbit-menu): compact action presentation and movement; visual reference only.
+- [CircularProgressIndicator – Anton Kozyriatskyi](https://github.com/antonKozyriatskyi/CircularProgressIndicator): ring indicators; Apache-2.0 project, design reference only.
+- [Android RoundProgressBar – QusionDev](https://github.com/Qusion/android-roundprogressbar): theme-colored arc motion; MIT project, design reference only.
+- [React Native Loader Kit – Duc Trung Mai](https://github.com/maitrungduc1410/react-native-loader-kit): in-flight action feedback; MIT project, design reference only.
+- [Arched Image ProgressBar – smrtyvz](https://github.com/smrtyvz/archedimageProgressbar): arched image highlight concept; visual reference only, code not imported.
 
-The package has been statically checked. A full live two-client acceptance test on FiveM Legacy and Enhanced was not performed as part of this repackaging.
-
-**Credits and licensing**
-
-Original project: Overextended — https://github.com/overextended/ox_target
-
-Original documentation: https://overextended.dev/docs/ox_target
-
-Custom eye interface and visual presentation: RealitySucksRP — https://github.com/RealitySucksRP
-
-License: MIT for the `ox_target` codebase. See `LICENSE` (required attribution); bundled third-party icon assets retain their respective licenses. This free release does not add restrictions on MIT rights.
+Core ox_target continues to be licensed under its included MIT `LICENSE` by
+Overextended. Existing bundled Font Awesome license remains in `web/vendor`.

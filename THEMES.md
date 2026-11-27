@@ -1,21 +1,12 @@
-# RS target themes
+# RS Orbital Target Interface — Themes
 
-Version 1.18.10 uses a normal compact list beside the eye for every target,
-including vehicles. Theme colors and icons remain active. Artwork and subtitle
-metadata stay in the library for customization; the compact renderer hides them.
+Version 1.21.0 uses circular orbital action nodes, context-aware multi-tone SVG icons, a centered reticle and local particle effects. The active styles are in `web/style.css`. The interface is defined in `web/index.html` and `web/js/main.js`.
 
-Matching target updates retain their buttons, hover state, and scroll position.
-A lost target blocks input immediately and clears its list after 120 ms, allowing
-a single missed ray to recover without flashing the list. Releasing the target
-hotkey hides it immediately. Pending selections and out-of-range previews remain
-disabled during updates.
+## Context-aware icons
 
-The theme library is `web/js/themes.js`. It includes the six garage cards plus
-robbery, medical, stash, chest, items, misc, engine, and parts. Labels and icon names choose a
-matching theme automatically; unmatched actions use misc. Action order,
-permissions, distances, callbacks and one-based option IDs remain owned by ox_target.
+`web/js/themes.js` selects an action theme using its label, metadata, event name, bones and icon classes. Explicit `rsTheme` values take precedence when they match an existing theme key. `web/js/icons.js` contains the bundled SVG icon definitions. `rsDescription` can override the standard description and `iconColor` can override the visual accent.
 
-To choose a theme on an individual target option:
+Example:
 
 ```lua
 exports.ox_target:addBoxZone({
@@ -27,37 +18,30 @@ exports.ox_target:addBoxZone({
         icon = 'fa-solid fa-box-archive',
         rsTheme = 'stash',
         rsDescription = 'Your personal storage',
-        -- iconColor = '#42dfac', -- optional: overrides the theme accent
+        iconColor = '#42dfac',
         onSelect = function(data)
-            -- Your existing interaction goes here.
+            -- Add your resource-specific interaction here.
         end,
     }},
 })
 ```
 
-To add a theme:
+To add a theme, define a local SVG entry in `web/js/icons.js` and add a matching key in `web/js/themes.js` with `color`, `svg` and an optional `match` regular expression. Preserve existing keys for integrations using explicit themes. The older bundled WebP artwork is retained for customization; active orbital nodes use SVG icons rather than the previous thumbnail list.
 
-1. Put its artwork in `web/assets/`, for example `fishing.webp`.
-2. Add an entry inside `targetThemes` in `web/js/themes.js`:
+## Optional vehicle interaction settings
 
-```js
-fishing: {
-  color: '#69cfff',
-  art: 'fishing', // filename without .webp; letters, numbers, _ and - only
-  icon: 'fa-solid fa-fish', // optional fallback when an option supplies no icon
-  description: 'Prepare your fishing equipment', // optional
-  match: /fishing|fishing rod|bait/i, // optional automatic label/icon match
-},
+Set these server convars before starting ox_target:
+
+```cfg
+setr ox_target:rsVehicleHalo 1
+setr ox_target:rsVehicleOverviewRange 8
+setr ox_target:rsBuiltinVehicleReach 4
 ```
 
-3. Use `rsTheme = 'fishing'`, or let the match rule pick it. Put specific automatic
-   rules before broader ones. Restart ox_target during your maintenance window
-   and retest target registration in your framework. A reconnect may be needed
-   if another resource registers its targets only once on startup.
+- `rsVehicleHalo`: set to 0 to disable the custom vehicle halo and restore single-ray vehicle-part targeting.
+- `rsVehicleOverviewRange`: overview range in meters (minimum 3).
+- `rsBuiltinVehicleReach`: reach for built-in vehicle door, hood and trunk actions (minimum 2). It does not replace third-party option distances.
 
-The manifest already includes `web/**`, so extra local artwork needs no manifest
-edits. Explicit theme selection also works with custom or translated labels.
-`rsDescription` takes priority over `description` in the theme metadata. The
-compact list keeps original action ordering, callbacks, and range restrictions.
+Out-of-range preview actions are marked as unavailable. The standard ox_target selection payload remains `[type, one-based option ID, zone index]`. Integrating resources are responsible for server-side authorization of their own sensitive actions.
 
-All artwork is bundled locally. The page makes no external image/font requests.
+Restart ox_target during a maintenance window and retest integrations after changing themes or settings. Some resources may need to re-register their targets after restart.

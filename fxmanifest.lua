@@ -6,12 +6,12 @@ lua54 'yes'
 game 'gta5'
 
 -- Resource Information
--- RealitySucksRP visual customization of Overextended ox_target (MIT).
+-- Local RS 3D Orbital Target HUD revision based on upstream 1.18.1.
 name 'ox_target'
-author 'Overextended (original), RealitySucksRP (visual customization)'
-version '1.18.10'
+author 'Overextended'
+version '1.21.0'
 repository 'https://github.com/overextended/ox_target'
-description 'ox_target Remastered: free eye targeting UI with themed actions and stable refreshes'
+description ''
 
 -- Manifest
 ui_page 'web/index.html'
