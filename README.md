@@ -1,10 +1,24 @@
-# ox_target Remastered
+# RS Orbital Target — ox_target Remastered
 
-**Free | Full source | FiveM | MIT licensed**
+<a href="https://reality-sucks-rp-webstore.tebex.io/package/7837366"><img src="https://dunb17ur4ymx4.cloudfront.net/packages/images/54926996f73a7a0ee0ff3216dd5636283214cfba.png" width="100%" alt="RS Orbital Target — 3D interactive targeting"></a>
+
+**Free | Full source | No escrow | Version 1.21.0 | FiveM Legacy and Enhanced | MIT licensed**
 
 RealitySucksRP's reworked third-eye targeting interface brings animated targeting feedback, color-coded interactions and custom artwork to the original Overextended ox_target foundation. Keep the familiar targeting API while giving your server a distinct visual identity.
 
 [Free on Tebex](https://reality-sucks-rp-webstore.tebex.io/package/7837366) | [Download ZIP](https://github.com/RealitySucksRP/ox_target-Remastered/releases/latest/download/ox_target.zip) | [GitHub releases](https://github.com/RealitySucksRP/ox_target-Remastered/releases) | [Website](https://realitysucksrp.github.io/) | [Discord](https://discord.gg/e9V3rPHySx) | [YouTube](https://www.youtube.com/@RealitySucksRP) | [All free scripts](https://reality-sucks-rp-webstore.tebex.io/category/free-scripts)
+
+[Watch gameplay preview](https://youtu.be/fIXhZ4y3IGM)
+
+## Screenshots
+
+<img src="https://dunb17ur4ymx4.cloudfront.net/packages/images/a2929468b651e9d1074a1050ce666dfca70102c8.png" width="100%" alt="RS Orbital Target — Tebex gallery image 2">
+
+<img src="https://dunb17ur4ymx4.cloudfront.net/packages/images/2a50179c9b1e5fe847b26992d960418eb7c2c581.png" width="100%" alt="RS Orbital Target — Tebex gallery image 3">
+
+<img src="https://dunb17ur4ymx4.cloudfront.net/packages/images/14e68b6295f07011ac8aee42b024d32ab0348d96.png" width="100%" alt="RS Orbital Target — Tebex gallery image 4">
+
+<img src="https://dunb17ur4ymx4.cloudfront.net/packages/images/c225163a6c9152b7ab717c97fbda805b4e05d91e.png" width="100%" alt="RS Orbital Target — Tebex gallery image 5">
 
 ## Included interaction artwork
 
